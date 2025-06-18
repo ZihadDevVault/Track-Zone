@@ -1,76 +1,84 @@
-import { useState } from "react";
+import  { useState } from "react";
+import { TextField, Select, MenuItem, InputLabel, FormControl, Button, Box } from "@mui/material";
 import { getOffset, TimeZones } from "../util/timezone";
-    
-const Clockform=({edit=true, value={timezone:'', offset:0, title:''}, HandelData})=>{
-    const [formValue, setFormValue]=useState({...value})
 
+const Clockform = ({ edit = true, value = { timezone: "", offset: 0, title: "" }, HandelData }) => {
+  const [formValue, setFormValue] = useState({ ...value });
 
-const changeHandeler=(e)=>{
-    let{name,value}=e.target;
+  const changeHandler = (e) => {
+    let { name, value } = e.target;
+    setFormValue((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-   
-    setFormValue(prev=>({
-        ...prev,
-            [name]:value
-    }))
-}
-
-const SubmitHandeler=(e)=>{
-    
-    e.preventDefault()
+  const SubmitHandler = (e) => {
+    e.preventDefault();
     HandelData({
-        ...formValue,
-        offset:formValue.offset*60
-    })
-}
+      ...formValue,
+      offset: Number(formValue.offset) * 60, 
+    });
+  };
 
+  return (
+    <Box component="form" onSubmit={SubmitHandler} sx={{ mt: 1 }}>
+      <TextField
+        fullWidth
+        margin="normal"
+        label="Title"
+        id="TitleId"
+        name="title"
+        value={formValue.title}
+        onChange={changeHandler}
+        required
+      />
 
-        return(
-           <form onSubmit={SubmitHandeler}>
-            
-            <label  htmlFor="TitleId">Title</label>
-            <input
-             type='text'
-             name='title'
-              id='TitleId' 
-              value={formValue.title} 
-              onChange={changeHandeler}
-              />
-            <label htmlFor="TimezoneId">TimeZone</label>
-            <select
-            
-            id="TimezoneId"
-            name="timezone"
-            value={formValue.timezone}
-            onChange={changeHandeler}
-            >
-                    {TimeZones().map((zone)=>(
-                        <option key={zone} value={zone}>{zone}</option>
-))}
-            </select>
-          {(formValue.timezone=='UTC' || formValue.timezone=='GMT') && <div>
-            
-            <label htmlFor="OffsetId">Offset</label>
-                <select 
-                    id='OffsetId'
-                    value={formValue.offset}
-                    onChange={changeHandeler}
-                    name='offset'
-                >
-                    {getOffset().map((offset)=>(
-                    <option key={offset} value={offset}>{offset}</option>
-                ))}
-                </select>
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="TimezoneId-label">TimeZone</InputLabel>
+        <Select
+          labelId="TimezoneId-label"
+          id="TimezoneId"
+          name="timezone"
+          value={formValue.timezone}
+          label="TimeZone"
+          onChange={changeHandler}
+          required
+        >
+          {TimeZones().map((zone) => (
+            <MenuItem key={zone} value={zone}>
+              {zone}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-            </div>}
+      {(formValue.timezone === "UTC" || formValue.timezone === "GMT") && (
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="OffsetId-label">Offset</InputLabel>
+          <Select
+            labelId="OffsetId-label"
+            id="OffsetId"
+            name="offset"
+            value={formValue.offset}
+            label="Offset"
+            onChange={changeHandler}
+            required
+          >
+            {getOffset().map((offset) => (
+              <MenuItem key={offset} value={offset}>
+                {offset}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
 
-
-
-           
-           <button type='submit'>{edit? 'Update':'Create'}</button>
-           </form>
-        )
-}
-
+      <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
+        {edit ? "Update" : "Create"}
+      </Button>
+    </Box>
+  );
+};
 
 export default Clockform;

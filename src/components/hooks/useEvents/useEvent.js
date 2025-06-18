@@ -1,91 +1,62 @@
 import { useState } from "react";
 import { generate } from "shortid";
-const useEvent=()=>{
 
-const init={
-    'a1|b1':{
-            id:'b1',
-            name:"Zihad",
-            Email:"zihad#mail.com",
-            firs:"making file"
-    },
-    'a1|b2':{
-            id:'b2',
-            name:"Zihad",
-            Email:"zihad#mail.com",
-            firs:"making file"
-    },
+const useEvent = () => {
+  // initial state খালি রাখা হয়েছে, নতুন ইভেন্ট যুক্ত হবে runtime এ
+  const [state, setState] = useState({});
 
-    'a2|b2':{
-        id:'b2',
-        name:'rakib',
-        Email:"rakib@gmail.com",
-        done:"I am Done my Project"
-    }
-}
+  // নির্দিষ্ট clockId অনুযায়ী ইভেন্টগুলো ফেরত দেবে
+  const getEventsByClock = (clockId) => {
+    return Object.entries(state)
+      .filter(([key]) => key.startsWith(clockId))
+      .map(([key, event]) => ({ ...event, key }));
+  };
 
-const [state,setState]=useState({...init})
+  // ইভেন্ট অ্যাড করার ফাংশন, clockId লাগবে যেই ক্লকের জন্য event
+  const addEvent = (clockId, event) => {
+    const id = generate();
+    const newKey = `${clockId}|${id}`;
+    setState((prev) => ({
+      ...prev,
+      [newKey]: { ...event, id, clockId, done: false },
+    }));
+  };
 
-const addEvent=(event)=>{
-    event.id=generate()
-    const {id,clockId}=event
-    setState(prev=>({
-        ...prev,
-        [`${id}|${clockId}`]:event
-    }))
-   
-}
+  // ইভেন্ট আপডেট করার ফাংশন, key দিয়ে আপডেট করবে
+  const updateEvent = (key, data) => {
+    setState((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], ...data },
+    }));
+  };
 
-const getEventsById=(clockId)=>{
-    return Object.keys(state).filter((event)=>event.startsWith(clockId))
-}
+  // ইভেন্ট ডিলিট করার ফাংশন
+  const deleteEvent = (key) => {
+    setState((prev) => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
+  };
 
+  // একটি ক্লক আইডির সব ইভেন্ট ডিলিট
+  const deleteEventsWithClockId = (clockId) => {
+    setState((prev) => {
+      const filtered = Object.entries(prev).filter(
+        ([key]) => !key.startsWith(clockId)
+      );
+      return Object.fromEntries(filtered);
+    });
+  };
 
-
-const getEvents=(isArray=false)=>{
-        if(!isArray) return state;
-        return Object.values(state)
-}
-
-const updateEvent=(data, id)=>{
-    let events={...state};
-    events[id]={
-        ...events.id,
-        ...data
-    }
-
-
-    setState(events)
-}
-
-
-const deleteEvents=(id)=>{
-        let events={...state}
-        delete events.id;
-        setState(events)
-}
-
-const deleteEventsWithClockId=(clockId)=>{
-    let events=Object.keys(state).filter((item)=>!item.startsWith(clockId))
-    setState(events)
-}
-
-
-
-
-    return{
-        events:state, 
-        getEventsById,
-        getEvents,
-        addEvent,
-        updateEvent,
-        deleteEvents,
-        deleteEventsWithClockId
-    }
-
-}
-
-
-
+  return {
+    events: state,
+    getEventsByClock,
+    addEvent,
+    updateEvent,
+    deleteEvent,
+    deleteEventsWithClockId,
+  };
+};
 
 export default useEvent;

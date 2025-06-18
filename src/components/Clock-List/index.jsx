@@ -1,52 +1,55 @@
-import { useEffect, useRef, useState } from "react";
-import useClock from "../hooks/useClock/useClock";
-import ClockAction from "../shared/clockAction";
-import DisplayClock from "../shared/Display-Clock";
-import {addSeconds, formatDistance} from 'date-fns'
-import useTimer from "../hooks/useTimer/useTimer";
+import CreateAnotherClock from "./CreateAnotherClock";
+import { Typography, Divider, Grid, Box } from "@mui/material";
 
-const CreateAnotherClock=({mytimezone, myoffset, clock, id, deleteItem,upadateClock, LocalClock})=>{
-    const{date}=useClock(mytimezone, myoffset)
-    const [isDeleted,setisDeleted]=useState(false)
-    isDeleted && deleteItem(id);
-// const timer=useTimer(date)
+const ClockList = ({ arrofClockValue, deleteItem, upadateClock, LocalClock }) => {
+  return (
+    <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        sx={{ color: "#357abd", fontWeight: "bold", textAlign: "center", letterSpacing: 1.2 }}
+      >
+        Other Clocks
+      </Typography>
 
-   
-  
-         return (
-            <div>
-                    <DisplayClock  clock={clock} offset={myoffset} date={date} timezone={mytimezone} />
-                    <ClockAction clock={clock} local={false}  setisidDeleted={setisDeleted} updateFunc={upadateClock}/>
-                 <h3>Difference: { formatDistance(LocalClock, date)}</h3>
-            </div>
-         )
-}
+      <Divider
+        sx={{
+          height: 3,
+          background: "linear-gradient(to right, #357abd, #4a90e2)",
+          borderRadius: 2,
+          mb: 3,
+          width: "80%",
+          mx: "auto",
+        }}
+      />
 
-const ClockList=({arrofClockValue,deleteItem, upadateClock, LocalClock})=>{
-
-
-return(
-
- <div>
-    <h1> Others Clocks</h1>
-    <hr/>
-
-
-    {arrofClockValue.length===0 ? (<p>There is no Clock. Please Create one</p>):(   <div>
-        {arrofClockValue.map((oneClock,index)=>{
-          
-        
-           return (
-            
-               <CreateAnotherClock key={index}  mytimezone={oneClock.timezone} myoffset={oneClock.offset} clock={oneClock} id={oneClock.id}  deleteItem={deleteItem} upadateClock={upadateClock}  LocalClock={LocalClock} />
-            
-           )
-        })}
-    </div>)}
- </div>
-
-)
-}
-
+      {arrofClockValue.length === 0 ? (
+        <Typography
+          variant="body1"
+          sx={{ textAlign: "center", fontStyle: "italic", color: "text.secondary", mt: 4 }}
+        >
+          There is no Clock. Please create one.
+        </Typography>
+      ) : (
+        <Grid container spacing={4} justifyContent="center">
+          {arrofClockValue.map((oneClock) => (
+            <Grid item xs={12} sm={6} md={4} key={oneClock.id}>
+              <CreateAnotherClock
+                mytimezone={oneClock.timezone}
+                myoffset={oneClock.offset}
+                clock={oneClock}
+                id={oneClock.id}
+                deleteItem={deleteItem}
+                upadateClock={upadateClock}
+                LocalClock={LocalClock}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Box>
+  );
+};
 
 export default ClockList;
